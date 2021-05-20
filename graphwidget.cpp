@@ -18,7 +18,7 @@ GraphWidget::GraphWidget(QWidget *parent)
 void GraphWidget::run()
 {
 
-    QFile file("/home/veu/test2.xml");
+    QFile file("/home/veu/test1.xml");
     if(!file.open(QFile::ReadOnly | QFile::Text)){
         qDebug()<<"error";
        return;
@@ -55,6 +55,7 @@ int GraphWidget::countChild(QDomElement root) {
 void GraphWidget::parseXml(QRectF* parent, QDomElement root)
 {
     QRectF rootNode = getRect(root.attribute("name"), calculateX(0, 1), 0);
+    scene->addRect(rootNode);
     parent = &rootNode;
     int numChild = countChild(root);
     int iChild = 0;
