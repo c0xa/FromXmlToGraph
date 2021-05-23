@@ -11,13 +11,11 @@ GraphWidget::GraphWidget(QWidget *parent)
     setRenderHint(QPainter::Antialiasing);
     setTransformationAnchor(AnchorUnderMouse);
     setMinimumSize(500, 300);
-
     run();
 }
 
 void GraphWidget::run()
 {
-
     QFile file("/home/veu/test2.xml");
     if(!file.open(QFile::ReadOnly | QFile::Text)){
         qDebug()<<"Error open";
