@@ -26,7 +26,8 @@ public:
 
     GraphWidget(QWidget *parent = nullptr);
 
-    void parseXml(QRectF* par_node, QDomElement root);
+    void readRootElement(QDomElement root);
+    void parseXmlAndDraw(QRectF* parent, QDomElement root, int arrayCountChild[], int level);
     void run();
     void read();
     void processRates();
@@ -35,11 +36,9 @@ public:
 
     QString getStringJson(QJsonObject jobj, QString key);
     QRectF getRect(QString text, int xpos, int ypos);
-    int calculateX(int i, int count);
-    int countChild(QDomElement root);
+    int calculateX(int index);
+    void countLevel(QDomElement root);
     QLineF* getLineBetweenRects(QRectF* parent, QRectF rect);
-    int getXStartPos(QDomElement root, int xpos);
-
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -52,11 +51,13 @@ protected:
 
 private:
     QGraphicsScene* scene;
-
     QString _filename;
     bool rightMousePressed = false;
     int _panStartY = 0;
     int _panStartX = 0;
+    int x = 0;
+    int y = 0;
+    int size = 0;
 };
 
 #endif

@@ -10,8 +10,11 @@ int main(int argc, char **argv)
     GraphWidget *widget = new GraphWidget;
 
     QMainWindow mainWindow;
+
     mainWindow.setCentralWidget(widget);
     mainWindow.show();
+
+
 
     return app.exec();
 }

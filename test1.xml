@@ -1,0 +1,9 @@
+<item name="Root Item">
+	<item name="Item 1">
+		<item name="Sub Item 1"></item>
+		<item name="Sub Item 2"></item>
+	</item>
+	<item name="Item 2">
+		<item name="Sub Item 3"></item>
+	</item>
+</item>

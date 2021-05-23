@@ -28,4 +28,3 @@ void MainWindow::on_pushButtonSelectFile_clicked()
     //_model->deserializeXML(QString(data));
     file.close();
 }
-

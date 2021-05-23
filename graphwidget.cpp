@@ -18,9 +18,9 @@ GraphWidget::GraphWidget(QWidget *parent)
 void GraphWidget::run()
 {
 
-    QFile file("/home/veu/test1.xml");
+    QFile file("/home/veu/test2.xml");
     if(!file.open(QFile::ReadOnly | QFile::Text)){
-        qDebug()<<"error";
+        qDebug()<<"Error open";
        return;
     }
     QByteArray data = file.readAll();
@@ -28,62 +28,52 @@ void GraphWidget::run()
     if (!doc.setContent(data))
             return;
     QDomElement root = doc.documentElement();
-    parseXml(nullptr, root);
+    readRootElement(root);
 }
 
-int GraphWidget::getXStartPos(QDomElement root, int xpos)
-{
-    return xpos - (root.childNodes().count() * 50) - 30;
+int GraphWidget::calculateX(int index) {
+    return (150 * index + 30);
 }
 
-int GraphWidget::calculateX(int i, int count) {
-    int x = count * 150;
-    return (x / count * i + 30);
-}
-
-int GraphWidget::countChild(QDomElement root) {
-    int count = 0;
+void GraphWidget::countLevel(QDomElement root) {
+    size++;
     for (int i = 0; i < root.childNodes().count(); i++)
     {
         QDomElement item = root.childNodes().at(i).toElement();
-        count += item.childNodes().count();
+        if (item.childNodes().count() > 0)
+            countLevel(item);
     }
-    return count;
 }
 
-
-void GraphWidget::parseXml(QRectF* parent, QDomElement root)
+void GraphWidget::parseXmlAndDraw(QRectF* parent, QDomElement root, int arrayCountChild[], int level)
 {
-    QRectF rootNode = getRect(root.attribute("name"), calculateX(0, 1), 0);
-    scene->addRect(rootNode);
-    parent = &rootNode;
-    int numChild = countChild(root);
-    int iChild = 0;
-    for (int i = 0; i < root.childNodes().count(); i++)
+    y += 100;
+    for (int j = 0; j < root.childNodes().count(); j++)
     {
-        QDomElement item = root.childNodes().at(i).toElement();
-        QRectF itemNode = getRect(item.attribute("name"), calculateX(i, root.childNodes().count()), 100);
+        QDomElement item = root.childNodes().at(j).toElement();
+        QRectF itemNode = getRect(item.attribute("name"), calculateX(arrayCountChild[level]), 100 * (level + 1));
+        arrayCountChild[level]++;
         scene->addRect(itemNode);
         scene->addLine(*getLineBetweenRects(parent, itemNode));
-        QRectF* parentItem = &itemNode;
-        for (int j = 0; j < item.childNodes().count(); j++)
-        {
-                QDomElement subItem = item.childNodes().at(j).toElement();
-                QRectF subItemNode = getRect(subItem.attribute("name"), calculateX(iChild++, numChild), 200);
-                scene->addRect(subItemNode);
-                scene->addLine(*getLineBetweenRects(parentItem, subItemNode));
-                QRectF* parentSubItem = &itemNode;
-                for (int v = 0; v < subItem.childNodes().count(); v++)
-                {
-                    QDomElement subSubItem = subItem.childNodes().at(v).toElement();
-                    QRectF subsubItemNode = getRect(subSubItem.attribute("name"), calculateX(v, subSubItem.childNodes().count()), 300);
-                    scene->addRect(subsubItemNode);
-                    scene->addLine(*getLineBetweenRects(parentSubItem, subsubItemNode));
-                }
-            }
-
+        if (item.childNodes().count() > 0) {
+            QRectF* parentItem = &itemNode;
+            parseXmlAndDraw(parentItem, item, arrayCountChild, level + 1);
         }
+    }
+}
 
+
+void GraphWidget::readRootElement(QDomElement root)
+{
+    QRectF rootNode = getRect(root.attribute("name"), calculateX(0), 0);
+    scene->addRect(rootNode);
+    QRectF* parent = &rootNode;
+    countLevel(root);
+    int arrayCountChild[size];
+    for (int i = 0; i < size; i++) {
+        arrayCountChild[i] = 0;
+    }
+    parseXmlAndDraw(parent, root, arrayCountChild, 0);
 }
 
 QLineF* GraphWidget::getLineBetweenRects(QRectF* parent, QRectF rect)
